@@ -10,34 +10,36 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-// Function to handle date parsing and response
-app.get("/api/:date?", function (req, res) {
-  let dateParam = req.params.date;
-  let date;
+app.get("/api", (req, res) => {
+  res.json({
+    unix: (new Date()).getTime(), 
+    utc: (new Date()).toUTCString()
+  });
+});
 
-  if (!dateParam) {
-    // If no date is provided, return the current date
-    date = new Date();
-  } else if (!isNaN(dateParam)) {
-    // If the date is a number, convert it to a date object (Unix timestamp)
-    date = new Date(parseInt(dateParam));
+app.get("/api/:date", (req, res) => {
+  const date = req.params.date;
+  
+  // Cek apakah date adalah angka atau string
+  let parsedDate;
+  
+  // Jika parameter hanya angka (dalam format timestamp)
+  if (!isNaN(date)) {
+    parsedDate = new Date(parseInt(date));
   } else {
-    // Otherwise, treat it as a string date
-    date = new Date(dateParam);
+    parsedDate = new Date(date); // Jika parameter adalah string
   }
-
-  // Check if the date is valid
-  if (date.toString() === 'Invalid Date') {
+  
+  // Jika parsedDate tidak valid
+  if (parsedDate.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
 
-  // Format the response
-  const response = {
-    unix: date.getTime(),
-    utc: date.toUTCString()
-  };
-
-  res.json(response);
+  // Jika tanggal valid, kembalikan nilai unix dan utc
+  res.json({
+    unix: parsedDate.getTime(),
+    utc: parsedDate.toUTCString()
+  });
 });
 
 // Listen on port set in environment variable or default to 3000
