@@ -1,32 +1,54 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time API</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the Time API</h1>
+    <p>Use the API endpoints to get the current time or parse a specific date.</p>
 
-<html>
-   <head>
-      <title>Timestamp Microservice | freeCodeCamp.org</title>
-      <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon-32x32.png" type="image/x-icon"/>
-      <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
-      <link href="style.css" rel="stylesheet" type="text/css">
-   </head>
+    <form id="dateForm">
+      <label for="dateInput">Enter a date to parse:</label>
+      <input type="text" id="dateInput" placeholder="YYYY-MM-DD" required />
+      <button type="submit">Submit</button>
+    </form>
 
-   <body>
-    <h1>Timestamp Microservice</h1>
-    <hr />
-    <div class="container">
-      <h2>Example Usage:</h2>
-      <ul>
-        <li><a href="api/2015-12-25">[project url]/api/2015-12-25</a></li>
-        <li><a href="api/1451001600000">[project url]/api/1451001600000</a></li>
-      </ul>
-
-      <h2>Example Output:</h2>
-      <p>
-        <code>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code>
-      </p>
+    <div id="result" class="result">
+      <!-- The result will be displayed here -->
     </div>
-    <div class="footer">
-      <p>
-        By <a href="https://www.freecodecamp.org/">freeCodeCamp.org</a>
-      </p>
-    </div>
-  </body>
+
+    <footer>
+      <p>Developed with ❤️ by Septian</p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('dateForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Prevent form from refreshing the page
+
+      const dateInput = document.getElementById('dateInput').value;
+      const resultDiv = document.getElementById('result');
+
+      try {
+        const response = await fetch(`/api/${encodeURIComponent(dateInput)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+        } else {
+          resultDiv.innerHTML = `
+            <p><strong>Unix Time:</strong> ${data.unix}</p>
+            <p><strong>UTC Time:</strong> ${data.utc}</p>
+          `;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+      }
+    });
+  </script>
+</body>
 </html>
